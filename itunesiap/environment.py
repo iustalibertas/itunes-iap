@@ -1,17 +1,12 @@
 
 __all__ = ('Environment', 'default', 'production', 'sandbox', 'review', 'current')
 
-
-class EnvironmentStack(list):
-    def push(self, env):
-        self.append(env)
-
+from .request import Request
 
 class Environment(object):
     """Environement provides option preset for `Request`. `default` is default"""
 
     ITEMS = ('use_production', 'use_sandbox')
-    _stack = EnvironmentStack()
 
     def __init__(self, **kwargs):
         self.use_production = kwargs.get('use_production', True)
@@ -22,25 +17,6 @@ class Environment(object):
         options = self.extract()
         options.update(**kwargs)
         return self.__class__(**options)
-
-    def push(self):
-        self._stack.push(self)
-
-    @classmethod
-    def pop(self):
-        self._stack.pop()
-
-    def __enter__(self):
-        self._ctx_id = len(self._stack)
-        self.push()
-        return self
-
-    def __exit__(self, exc_type, exc_value, tb):
-        self._stack.pop(self._ctx_id)
-
-    @classmethod
-    def current(cls):
-        return cls._stack[-1]
 
     def override(self, **kwargs):
         """Override options in kwargs to given object `self`."""
@@ -55,16 +31,12 @@ class Environment(object):
             options[item] = getattr(self, item)
         return options
 
+    def verify(self, receipt_data, password=None, proxy_url=None, **kwargs):
+        return Request(receipt_data, password, proxy_url).verify(self, **kwargs)
+
 default = Environment(use_production=True, use_sandbox=False, verify_ssl=True)
 production = Environment(use_production=True, use_sandbox=False, verify_ssl=True)
 sandbox = Environment(use_production=False, use_sandbox=True, verify_ssl=True)
 review = Environment(use_production=True, use_sandbox=True, verify_ssl=True)
 
 unsafe = Environment(use_production=True, use_sandbox=True, verify_ssl=False)
-
-
-default.push()
-
-
-def current():
-    return Environment.current()
