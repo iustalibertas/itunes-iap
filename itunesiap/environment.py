@@ -18,28 +18,6 @@ class Environment(object):
         options.update(**kwargs)
         return self.__class__(**options)
 
-    def push(self):
-        self._stack.push(self)
-
-    @classmethod
-    def pop(self, ctx_id=None):
-        if ctx_id is None:
-            self._stack.pop(ctx_id)
-        else:
-            self._stack.pop()
-
-    def __enter__(self):
-        self._ctx_id = len(self._stack)
-        self.push()
-        return self
-
-    def __exit__(self, exc_type, exc_value, tb):
-        self._stack.pop(self._ctx_id)
-
-    @classmethod
-    def current(cls):
-        return cls._stack[-1]
-
     def override(self, **kwargs):
         """Override options in kwargs to given object `self`."""
         for item in self.ITEMS:
