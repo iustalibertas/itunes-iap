@@ -5,6 +5,20 @@ itunes-iap v2
     :target: https://travis-ci.org/youknowone/itunes-iap
 .. image:: https://coveralls.io/repos/github/youknowone/itunes-iap/badge.svg?branch=master :target: https://coveralls.io/github/youknowone/itunes-iap?branch=master
 
+
+IMPORTANT
+-----------------
+This branch removes the global stack, I was in a hurry, so I did not update the tests.
+I required the change, because I needed to run the IAP-Validation in a multithreaded environment.
+
+To do validation, simply do:
+
+    >>> import itunesiap
+    >>> print itunesiap.env.sandbox.verify(raw_data)
+    >>> print itunesiap.env.production.verify(raw_data)
+
+
+
 Note for v1 users
 -----------------
 
